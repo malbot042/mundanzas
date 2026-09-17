@@ -1,0 +1,159 @@
+:root {
+    --color-primario: #2f6f4f;
+    --color-texto: #1f2937;
+    --color-borde: #d1d5db;
+    --color-fondo: #f9fafb;
+    color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--color-texto);
+    background: var(--color-fondo);
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    background: var(--color-primario);
+    color: white;
+}
+
+.topbar .brand {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.badge--online { background: #22c55e; }
+.badge--offline { background: #ef4444; }
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1.25rem;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-primario);
+    border-radius: 6px;
+    background: white;
+    color: var(--color-primario);
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.btn--primary {
+    background: var(--color-primario);
+    color: white;
+}
+
+.btn--link {
+    border-color: transparent;
+}
+
+.messages {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+}
+
+.message {
+    padding: 0.6rem 0.9rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    background: #e5f6ea;
+    border: 1px solid #86d19b;
+}
+
+.message--error { background: #fde8e8; border-color: #f2a5a5; }
+.message--info { background: #e8f1fd; border-color: #a5c8f2; }
+
+.filtros {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.filtros input, .filtros select {
+    padding: 0.4rem;
+    border: 1px solid var(--color-borde);
+    border-radius: 6px;
+}
+
+.tabla-mudanzas {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.tabla-mudanzas th, .tabla-mudanzas td {
+    text-align: left;
+    padding: 0.6rem;
+    border-bottom: 1px solid var(--color-borde);
+}
+
+.acciones a { margin-right: 0.75rem; }
+
+.estado {
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    background: #e5e7eb;
+}
+
+.estado--pendiente { background: #fef3c7; }
+.estado--confirmada { background: #dbeafe; }
+.estado--en_curso { background: #ede9fe; }
+.estado--completada { background: #dcfce7; }
+.estado--cancelada { background: #fee2e2; }
+
+.pendientes {
+    margin-top: 2rem;
+}
+
+.form-mudanza {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    max-width: 640px;
+}
+
+.campo { display: flex; flex-direction: column; gap: 0.25rem; }
+.campo input, .campo select, .campo textarea {
+    padding: 0.5rem;
+    border: 1px solid var(--color-borde);
+    border-radius: 6px;
+    font: inherit;
+}
+.campo--error input, .campo--error select, .campo--error textarea {
+    border-color: #ef4444;
+}
+.campo .error { color: #b91c1c; font-size: 0.85rem; margin: 0; }
+.campo .ayuda { color: #6b7280; font-size: 0.85rem; margin: 0; }
+
+.acciones-formulario { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+.aviso-offline { color: #6b7280; font-size: 0.85rem; margin: 0; }

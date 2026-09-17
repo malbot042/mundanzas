@@ -1,0 +1,86 @@
+{% extends "mudanzas/base.html" %}
+
+{% block title %}Mudanzas — La Selva Mudanzas{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>Mudanzas</h1>
+        <a class="btn btn--primary" href="{% url 'mudanzas:create' %}">+ Nueva mudanza</a>
+    </div>
+
+    <form class="filtros" method="get">
+        <input type="text" name="cliente" placeholder="Buscar por cliente"
+               value="{{ filtros.cliente }}">
+        <input type="date" name="fecha" value="{{ filtros.fecha }}">
+        <select name="estado">
+            <option value="">Todos los estados</option>
+            {% for valor, etiqueta in estados %}
+                <option value="{{ valor }}" {% if filtros.estado == valor %}selected{% endif %}>
+                    {{ etiqueta }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn">Filtrar</button>
+        <a class="btn btn--link" href="{% url 'mudanzas:list' %}">Limpiar</a>
+    </form>
+
+    <table class="tabla-mudanzas">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Origen → Destino</th>
+                <th>Estado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mudanza in mudanzas %}
+                <tr>
+                    <td>{{ mudanza.cliente_nombre }}</td>
+                    <td>{{ mudanza.fecha_mudanza|date:"d/m/Y" }}</td>
+                    <td>{{ mudanza.direccion_origen }} → {{ mudanza.direccion_destino }}</td>
+                    <td><span class="estado estado--{{ mudanza.estado }}">{{ mudanza.get_estado_display }}</span></td>
+                    <td class="acciones">
+                        <a href="{% url 'mudanzas:edit' mudanza.pk %}">Editar</a>
+                        <a href="{% url 'mudanzas:print' mudanza.pk %}" target="_blank">Imprimir</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">No hay mudanzas registradas todavía.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <section x-data="pendientesOffline()" x-init="cargar()" x-show="pendientes.length > 0" class="pendientes">
+        <h2>Pendientes de sincronizar (guardadas sin conexión)</h2>
+        <table class="tabla-mudanzas">
+            <tbody>
+                <template x-for="m in pendientes" :key="m.client_uuid">
+                    <tr>
+                        <td x-text="m.cliente_nombre"></td>
+                        <td x-text="m.fecha_mudanza"></td>
+                        <td x-text="m.direccion_origen + ' → ' + m.direccion_destino"></td>
+                        <td><span class="estado estado--pendiente">Pendiente de sincronizar</span></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </section>
+
+    <script>
+        function pendientesOffline() {
+            return {
+                pendientes: [],
+                async cargar() {
+                    if (window.mudanzasOffline) {
+                        this.pendientes = await window.mudanzasOffline.listPending();
+                    }
+                },
+            };
+        }
+        document.addEventListener("mudanzas:sync", () => location.reload());
+    </script>
+{% endblock %}

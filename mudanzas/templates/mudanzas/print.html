@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mudanza de {{ mudanza.cliente_nombre }} — La Selva Mudanzas</title>
+    <link rel="stylesheet" href="{% static 'css/print.css' %}">
+</head>
+<body>
+    <button class="no-imprimir btn" onclick="window.print()">Imprimir</button>
+
+    <article class="hoja-mudanza">
+        <header>
+            <h1>La Selva Mudanzas</h1>
+            <h2>Formulario de mudanza</h2>
+        </header>
+
+        <section>
+            <h3>Cliente</h3>
+            <dl>
+                <dt>Nombre</dt><dd>{{ mudanza.cliente_nombre }}</dd>
+                <dt>Teléfono</dt><dd>{{ mudanza.cliente_telefono }}</dd>
+                <dt>Email</dt><dd>{{ mudanza.cliente_email|default:"—" }}</dd>
+            </dl>
+        </section>
+
+        <section>
+            <h3>Mudanza</h3>
+            <dl>
+                <dt>Fecha</dt><dd>{{ mudanza.fecha_mudanza|date:"d/m/Y" }}</dd>
+                <dt>Dirección de origen</dt><dd>{{ mudanza.direccion_origen }}</dd>
+                <dt>Dirección de destino</dt><dd>{{ mudanza.direccion_destino }}</dd>
+                <dt>Estado</dt><dd>{{ mudanza.get_estado_display }}</dd>
+            </dl>
+        </section>
+
+        <section>
+            <h3>Inventario / objetos a mover</h3>
+            <p class="texto-largo">{{ mudanza.inventario|default:"—"|linebreaksbr }}</p>
+        </section>
+
+        <section>
+            <h3>Observaciones</h3>
+            <p class="texto-largo">{{ mudanza.observaciones|default:"—"|linebreaksbr }}</p>
+        </section>
+
+        <section class="conformidad">
+            <h3>Conformidad</h3>
+            <p>
+                {% if mudanza.conforme %}
+                    El cliente <strong>{{ mudanza.firma_cliente|default:mudanza.cliente_nombre }}</strong>
+                    da su conformidad con los datos de este formulario.
+                {% else %}
+                    Pendiente de conformidad del cliente.
+                {% endif %}
+            </p>
+            <div class="firma">
+                <span>Firma:</span>
+                <div class="linea-firma"></div>
+            </div>
+        </section>
+    </article>
+</body>
+</html>

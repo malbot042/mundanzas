@@ -18,7 +18,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from mudanzas import views as mudanzas_views
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("service-worker.js", mudanzas_views.service_worker, name="service_worker"),
     path("", include("mudanzas.urls")),
 ]

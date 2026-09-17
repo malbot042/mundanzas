@@ -19,8 +19,8 @@ Permitir al equipo de campo rellenar el formulario de una mudanza (datos del cli
 - **Backend**: Django 6, Python 3.12, gestionado con [uv](https://docs.astral.sh/uv/).
 - **Base de datos**: SQLite3 (por defecto de Django, archivo `db.sqlite3`).
 - **Frontend**: HTML + JavaScript vanilla, usando HTMX para las interacciones con el servidor (sin build step ni frameworks SPA) y/o Alpine.js para estado e interactividad en el cliente.
-- **Offline-first**: Service Worker + almacenamiento local (IndexedDB / localStorage) para cachear la app y encolar los formularios pendientes de sincronizar (pendiente de implementar).
-- **Sin dependencias de compilación**: no se requiere Node/webpack para el frontend; los assets se sirven directamente desde Django (estáticos).
+- **Offline-first**: Service Worker (`static/js/service-worker.js`, servido en `/service-worker.js`) + IndexedDB (`static/js/offline.js`) para cachear la app y encolar los formularios pendientes de sincronizar.
+- **Sin dependencias de compilación**: no se requiere Node/webpack para el frontend; `htmx.min.js` y `alpine.min.js` están vendorizados en `static/js/` y se sirven directamente desde Django.
 
 ## Estructura del proyecto
 
@@ -30,19 +30,19 @@ mudanceslaselva/
 ├── pyproject.toml          # dependencias gestionadas con uv
 ├── uv.lock
 ├── db.sqlite3               # base de datos SQLite (no versionada)
-├── config/                  # settings, urls, wsgi/asgi del proyecto Django
-├── mudanzas/                 # app Django: modelos, vistas, formularios, API
-│   ├── models.py             # (pendiente) modelo Mudanza (cliente, direcciones, inventario, estado...)
-│   ├── views.py               # (pendiente) listado, alta, edición, detalle/impresión
+├── config/                  # settings, urls, wsgi/asgi; sirve /service-worker.js en la raíz
+├── mudanzas/                 # app Django: modelo, vistas, formularios, API de sincronización
+│   ├── models.py              # modelo Mudanza (cliente, direcciones, inventario, estado, client_uuid)
+│   ├── forms.py                # MudanzaForm
+│   ├── views.py                 # listado, alta, edición, impresión, api_sync
 │   ├── urls.py
-│   └── templates/mudanzas/    # templates HTML con HTMX/Alpine (pendiente)
+│   └── templates/mudanzas/      # base.html, list.html, form.html, print.html
 ├── static/
-│   ├── js/                    # JS vanilla, htmx.min.js, alpine.min.js, service-worker.js (pendiente)
-│   └── css/
+│   ├── js/                     # htmx.min.js, alpine.min.js, offline.js, service-worker.js
+│   ├── css/                    # base.css, print.css
+│   └── manifest.webmanifest
 └── README.md
 ```
-
-> El proyecto Django y el entorno ya están inicializados. El modelo `Mudanza`, las vistas de listado/alta/edición/impresión y el frontend HTMX/Alpine todavía están por implementar.
 
 ## Puesta en marcha
 
@@ -53,9 +53,11 @@ uv run python manage.py createsuperuser
 uv run python manage.py runserver
 ```
 
-## Flujo offline (previsto)
+Abre `http://127.0.0.1:8000/` para ver el listado, `/nueva/` para dar de alta una mudanza, `/<id>/editar/` para editarla y `/<id>/imprimir/` para la vista imprimible.
 
-1. Al cargar la app, un Service Worker cachea el HTML/CSS/JS necesarios para trabajar sin conexión.
-2. Los formularios rellenados sin conexión se guardan en IndexedDB/localStorage con un identificador temporal y un estado `pendiente de sincronizar`.
-3. Al recuperar la conexión, la app envía (vía `fetch`/HTMX) los formularios pendientes al backend Django, que los persiste y confirma la sincronización.
-4. El listado de formularios combina los datos ya sincronizados (desde el servidor) con los que aún están pendientes en local, indicando su estado.
+## Flujo offline
+
+1. Al cargar la app, el Service Worker (`/service-worker.js`, con scope en toda la raíz) cachea el listado, el formulario de alta y los estáticos (`base.css`, `htmx.min.js`, `alpine.min.js`, `offline.js`); las páginas de edición/impresión se van cacheando a medida que se visitan.
+2. Los formularios de alta/edición tienen el atributo `data-offline-form`. Si al enviarlos `navigator.onLine` es `false`, `offline.js` evita el envío normal, guarda los datos en IndexedDB (base `mudanzas-offline`, con un `client_uuid` generado en el cliente) y redirige al listado mostrando un aviso local. Si hay conexión, el formulario se envía de forma normal contra `mudanzas:create` / `mudanzas:edit`.
+3. Al recuperar la conexión (evento `online` del navegador, o al cargar cualquier página), `offline.js` sincroniza cada mudanza pendiente contra `POST /api/sync/`, que crea o actualiza el registro por `client_uuid` (evitando duplicados si se reintenta).
+4. El listado (`list.html`) muestra los registros ya sincronizados (renderizados por Django) y, debajo, una sección "Pendientes de sincronizar" que lee directamente de IndexedDB mediante Alpine.js; al sincronizar con éxito se recarga la página.

@@ -1,0 +1,37 @@
+{% extends "mudanzas/base.html" %}
+
+{% block title %}{% if modo == "editar" %}Editar mudanza{% else %}Nueva mudanza{% endif %} — La Selva Mudanzas{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>{% if modo == "editar" %}Editar mudanza{% else %}Nueva mudanza{% endif %}</h1>
+        <a class="btn btn--link" href="{% url 'mudanzas:list' %}">← Volver al listado</a>
+    </div>
+
+    <form method="post"
+          action="{% if modo == 'editar' %}{% url 'mudanzas:edit' mudanza.pk %}{% else %}{% url 'mudanzas:create' %}{% endif %}"
+          data-offline-form
+          class="form-mudanza">
+        {% csrf_token %}
+        <input type="hidden" name="client_uuid" value="{{ mudanza.client_uuid|default:'' }}">
+
+        {% for field in form %}
+            <div class="campo {% if field.errors %}campo--error{% endif %}">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}<p class="ayuda">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}
+                    <p class="error">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <div class="acciones-formulario">
+            <button type="submit" class="btn btn--primary">Guardar mudanza</button>
+            <p class="aviso-offline">
+                Si no tienes conexión, se guardará en este dispositivo y se sincronizará
+                automáticamente cuando vuelva la conexión.
+            </p>
+        </div>
+    </form>
+{% endblock %}

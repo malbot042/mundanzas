@@ -1,0 +1,49 @@
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: #111827;
+    margin: 2rem;
+}
+
+.hoja-mudanza header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.hoja-mudanza h1 { margin: 0; font-size: 1.4rem; }
+.hoja-mudanza h2 { margin: 0.2rem 0 0; font-weight: normal; color: #4b5563; }
+
+.hoja-mudanza section {
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.75rem;
+}
+
+.hoja-mudanza h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+
+dl { margin: 0; display: grid; grid-template-columns: 220px 1fr; row-gap: 0.35rem; }
+dt { font-weight: 600; }
+dd { margin: 0; }
+
+.texto-largo { white-space: pre-line; }
+
+.firma {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.linea-firma {
+    flex: 1;
+    border-bottom: 1px solid #111827;
+    height: 2rem;
+}
+
+.no-imprimir {
+    margin-bottom: 1.5rem;
+}
+
+@media print {
+    .no-imprimir { display: none; }
+    body { margin: 0; }
+}
