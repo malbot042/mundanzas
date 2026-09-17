@@ -61,3 +61,5 @@ Abre `http://127.0.0.1:8000/` para ver el listado, `/nueva/` para dar de alta un
 2. Los formularios de alta/edición tienen el atributo `data-offline-form`. Si al enviarlos `navigator.onLine` es `false`, `offline.js` evita el envío normal, guarda los datos en IndexedDB (base `mudanzas-offline`, con un `client_uuid` generado en el cliente) y redirige al listado mostrando un aviso local. Si hay conexión, el formulario se envía de forma normal contra `mudanzas:create` / `mudanzas:edit`.
 3. Al recuperar la conexión (evento `online` del navegador, o al cargar cualquier página), `offline.js` sincroniza cada mudanza pendiente contra `POST /api/sync/`, que crea o actualiza el registro por `client_uuid` (evitando duplicados si se reintenta).
 4. El listado (`list.html`) muestra los registros ya sincronizados (renderizados por Django) y, debajo, una sección "Pendientes de sincronizar" que lee directamente de IndexedDB mediante Alpine.js; al sincronizar con éxito se recarga la página.
+
+Explicación detallada, con fragmentos de código: [HOWTO.md](HOWTO.md).
